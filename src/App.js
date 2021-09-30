@@ -175,7 +175,7 @@ const App = () => {
             }
         }
         setTimeout(startPlay, 500)
-        setScore(0)
+        setScore(0);
          
     }
     
