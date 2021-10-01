@@ -20,15 +20,14 @@ const App = () => {
     const [gameLevel, setGameLevel] = useState(settingsFromBackUp ? settingData.gameLevel : 'easy');
     const [displayMenu, setDisplayMenu] = useState(false);
     const [isPlaying, setIsPlaying] = useState(false);
-    const [repeat, setRepeat] = useState(true);
     const [gameStarted, setGameStarted] = useState(false);
     const [questionArray, setQuestionArray] = useState([{question: 'hello', options: ['Home'], answer: 'ok'}]);
-    const [gameTime, setGameTime] = useState(30);
+    const [gameTime, setGameTime] = useState(5);
     const [timeLeft, setTimeLeft] = useState(gameTime);
     const [currentIndex, setCurrentIndex] = useState(0);
     const [passed, setPassed] = useState('no');
     const [score, setScore] = useState(0);
-    const [attemps, setAttempts] = useState(6);
+    const [attemps, setAttempts] = useState(5);
 
 
     
@@ -115,6 +114,9 @@ const App = () => {
             case 'generalknowledge':
                 id = 9;
                 break;
+            
+            default:
+                id = 9;
         }
 
        console.log('Current ID', id)
@@ -158,11 +160,12 @@ const App = () => {
         //Check if we already have the questions downloaded and stored locally
         // let sortedQuest = [...questionArray]
         // sortedQuest[currentIndex].options.sort((a, b)=> 0.5 - Math.random());
-        setQuestionArray(JSON.parse(window.localStorage.getItem(`${gameCat}-${gameLevel}`)).length != 0 ? JSON.parse(window.localStorage.getItem(`${gameCat}-${gameLevel}`)).sort((a, b)=> 0.5 - Math.random()) : JSON.parse(window.localStorage.getItem(`generalknowledge-${gameLevel}`)).sort((a, b)=> 0.5 - Math.random()));
+        setQuestionArray(JSON.parse(window.localStorage.getItem(`${gameCat}-${gameLevel}`)).length !== 0 ? JSON.parse(window.localStorage.getItem(`${gameCat}-${gameLevel}`)).sort((a, b)=> 0.5 - Math.random()) : JSON.parse(window.localStorage.getItem(`generalknowledge-${gameLevel}`)).sort((a, b)=> 0.5 - Math.random()));
        
-        setPassed('no')
+        setPassed('false')
         setScore(0)
-        setAttempts(6)
+        setGameTime(gameTime)
+        setAttempts(5)
         setGameStarted(true);
         const startPlay = ()=>{
             
@@ -189,9 +192,9 @@ const App = () => {
         }else{
             setPassed('false')
             setTimeLeft(0);
-            setAttempts(attemps-1)
+    
 
-
+          
         }   
     }
 
@@ -199,8 +202,10 @@ const App = () => {
 
     const onNextClick = ()=>{
         if(attemps > 0){
-
-            setPassed('no')
+            if(passed==='false'){
+                setAttempts(attemps-1)
+            }
+            setPassed('false')
             setTimeLeft(gameTime);
             setCurrentIndex(currentIndex+1);
         }
@@ -215,6 +220,7 @@ const App = () => {
         setGameStarted(!gameStarted)
         setTimeLeft(0);
         setCurrentIndex(0);
+
         
         
 
@@ -222,7 +228,10 @@ const App = () => {
         
     }
     
-  
+    // if(gameStarted && timeLeft <=0   && passed==='false'){
+    //     setAttempts(attemps-1)
+    //     setPassed('false')
+    // }
     
     //Update Game settings
 
@@ -235,17 +244,14 @@ const App = () => {
     //Simulate A CountDown Timer
    
 
-    if(timeLeft > 0 && gameStarted && passed === 'no'){
+    if(timeLeft > 0 && gameStarted){
        setTimeout(()=>setTimeLeft(timeLeft-1), 1000); 
     }else {
        
         setTimeLeft(0);
     }
     
-    
-    if(timeLeft <=0 && passed==='no'){
-        setAttempts(attemps-1)
-    }
+
 
     }, [gameCat, gameLevel, onSound,timeLeft, gameStarted])
     

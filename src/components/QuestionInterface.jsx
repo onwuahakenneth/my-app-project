@@ -5,10 +5,10 @@ const QuestionInterface = ({gameStarted, timeLeft, checkAnswer, onNextClick, que
     //determine the color based on the option clicked
     const defaultColor = 'linear-gradient(285deg, rgba(214, 213, 213, 0.38)50%, rgba(98, 124, 177, 0.58)50%)';
     let bColor = 'linear-gradient(285deg, rgba(214, 213, 213, 0.38)50%, rgba(98, 124, 177, 0.58)50%)';
-    if(timeLeft > 0 && passed=='true'){
+    if(timeLeft > 0 && passed==='true'){
         bColor = 'green';
     }
-    if(timeLeft > 0 && passed=='false'){
+    if(timeLeft > 0 && passed==='false'){
         bColor = 'red';
     }
     if(timeLeft <=0 ){
@@ -33,7 +33,7 @@ const QuestionInterface = ({gameStarted, timeLeft, checkAnswer, onNextClick, que
                 
                 {copy[currentIndex].options.map((option, id)=>(
                     
-                    <p key={id} onClick={()=>setTimeout(checkAnswer(option), 100)} id={id} style={{background: `${id == copy[currentIndex].options.indexOf(correctAnswer) && timeLeft <= 0? bColor : defaultColor }`, pointerEvents: `${timeLeft <= 0 || (passed !== 'no')? 'none' : 'all'}`}}>
+                    <p key={id} onClick={()=>setTimeout(checkAnswer(option), 100)} id={id} style={{background: `${id === copy[currentIndex].options.indexOf(correctAnswer) && timeLeft <= 0? bColor : defaultColor }`, pointerEvents: `${timeLeft <= 0 || (passed !== 'false')? 'none' : 'all'}`}}>
 
                         {option}
 
