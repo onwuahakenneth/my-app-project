@@ -6,7 +6,11 @@ import EndButton from "./components/EndButton";
 import QuestionInterface from "./components/QuestionInterface";
 import Footer from "./components/Footer";
 import Sound from 'react-sound';
-import myD from './sounds/4 final mid game.mp3';
+import startSound from './sounds/start game.mp3';
+import midSound from './sounds/final mid game.mp3';
+import failSound from './sounds/fail short.wav';
+import passedSound from './sounds/click sound.wav';
+import overSound from './sounds/game over.mp3';
 
 import { useState, useEffect } from "react";
 
@@ -22,12 +26,12 @@ const App = () => {
     const [isPlaying, setIsPlaying] = useState(false);
     const [gameStarted, setGameStarted] = useState(false);
     const [questionArray, setQuestionArray] = useState([{question: 'hello', options: ['Home'], answer: 'ok'}]);
-    const [gameTime, setGameTime] = useState(30);
+    const [gameTime, setGameTime] = useState(5);
     const [timeLeft, setTimeLeft] = useState(gameTime);
     const [currentIndex, setCurrentIndex] = useState(0);
     const [passed, setPassed] = useState('no');
     const [score, setScore] = useState(0);
-    const [attemps, setAttempts] = useState(5);
+    const [attemps, setAttempts] = useState(15);
 
 
     
@@ -162,10 +166,10 @@ const App = () => {
         // sortedQuest[currentIndex].options.sort((a, b)=> 0.5 - Math.random());
         setQuestionArray(JSON.parse(window.localStorage.getItem(`${gameCat}-${gameLevel}`)).length !== 0 ? JSON.parse(window.localStorage.getItem(`${gameCat}-${gameLevel}`)).sort((a, b)=> 0.5 - Math.random()) : JSON.parse(window.localStorage.getItem(`generalknowledge-${gameLevel}`)).sort((a, b)=> 0.5 - Math.random()));
        
-        setPassed('false')
+        setPassed('no')
         setScore(0)
         setGameTime(gameTime)
-        setAttempts(5)
+        setAttempts(15)
         setGameStarted(true);
         const startPlay = ()=>{
             
@@ -204,6 +208,7 @@ const App = () => {
         if(attemps > 0){
             if(passed==='false'){
                 setAttempts(attemps-1)
+                setTimeLeft(gameTime)
             }
             setPassed('false')
             setTimeLeft(gameTime);
@@ -244,7 +249,7 @@ const App = () => {
     //Simulate A CountDown Timer
    
 
-    if(timeLeft > 0 && gameStarted){
+    if(timeLeft > 0 && gameStarted && !(passed==='true')){
        setTimeout(()=>setTimeLeft(timeLeft-1), 1000); 
     }else {
        
@@ -253,7 +258,7 @@ const App = () => {
     
 
 
-    }, [gameCat, gameLevel, onSound,timeLeft, gameStarted])
+    }, [gameCat, gameLevel, onSound,timeLeft, gameStarted, passed])
     
    
 
@@ -265,7 +270,16 @@ const App = () => {
             <MenuOptions  displayMenu={displayMenu}  toggleOnSound={toggleOnSound}  onSound={onSound} play={play} updateCategory={updateCategory} updateLevel={updateLevel} gameLevel={gameLevel}gameCat={gameCat} />
             <PlayButton play={play} displayMenu={displayMenu} gameStarted={gameStarted}/>
             <GamePlayInfo attemps={attemps} score={score} gameStarted={gameStarted} timeLeft={timeLeft}/>
-            <Sound playStatus={isPlaying && onSound ? Sound.status.PLAYING : Sound.status.STOPPED}  url={myD} loop={true} volume={gameStarted ? 45 : displayMenu ? 15: 25} playbackRate={gameStarted ? 0.8 : displayMenu ? 0.51 : 0.58 } autoLoad={true}/>
+
+            <Sound playStatus={isPlaying && onSound && attemps > 0 ? Sound.status.PLAYING : Sound.status.STOPPED}  url={startSound} loop={true} volume={gameStarted ? 45 : displayMenu ? 15: 25} autoLoad={true}/>
+
+            <Sound playStatus={isPlaying && onSound && passed==='true' ? Sound.status.PLAYING : Sound.status.STOPPED}  url={passedSound} loop={true} volume={60} autoLoad={true}/>
+
+            <Sound playStatus={isPlaying && onSound && passed==='false' ? Sound.status.PLAYING : Sound.status.STOPPED}  url={failSound} loop={true} volume={60} autoLoad={true}/>
+
+            <Sound playStatus={isPlaying && onSound && attemps === 0 ? Sound.status.PLAYING : Sound.status.STOPPED}  url={overSound} loop={true} volume={60} autoLoad={true}/>
+
+            <Sound playStatus={isPlaying && onSound && attemps > 0  && currentIndex > 20? Sound.status.PLAYING : Sound.status.STOPPED}  url={midSound} loop={true} volume={45} autoLoad={true}/>
            <EndButton gameStarted={gameStarted} handleClick={onEndClick}/>
            <QuestionInterface attemps={attemps} passed={passed} currentIndex={currentIndex} questionArray={questionArray} checkAnswer={checkAnswer} gameStarted={gameStarted} timeLeft={timeLeft} onNextClick={onNextClick}/>
            <Footer />

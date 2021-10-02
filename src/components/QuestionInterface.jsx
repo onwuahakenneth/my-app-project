@@ -33,7 +33,7 @@ const QuestionInterface = ({gameStarted, timeLeft, checkAnswer, onNextClick, que
                 
                 {copy[currentIndex].options.map((option, id)=>(
                     
-                    <p key={id} onClick={()=>setTimeout(checkAnswer(option), 100)} id={id} style={{background: `${id === copy[currentIndex].options.indexOf(correctAnswer) && timeLeft <= 0? bColor : defaultColor }`, pointerEvents: `${timeLeft <= 0 || (passed !== 'false')? 'none' : 'all'}`}}>
+                    <p key={id} onClick={()=>setTimeout(checkAnswer(option), 10)} id={id} style={{background: `${id === copy[currentIndex].options.indexOf(correctAnswer) && timeLeft <= 0? bColor : defaultColor }`, pointerEvents: `${timeLeft <= 0 || (passed === 'false')? 'none' : 'all'}`}}>
 
                         {option}
 
