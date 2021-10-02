@@ -1,0 +1,3 @@
+NOTE:
+
+This app is under development and may not have the best functionalities right now. I'm open to contributions...
