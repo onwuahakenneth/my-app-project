@@ -189,17 +189,14 @@ const App = () => {
     
 
     const checkAnswer = (option)=>{
-        setTimeLeft(0)
+
         if(questionArray[currentIndex].answer === option){
             setPassed('true')
+            setTimeLeft(0)
             setScore(score+1)
-            setTimeout(onNextClick, 500)
+            setTimeout(onNextClick, 100)
         }else{
             setPassed('false')
-            setTimeLeft(0);
-    
-
-          
         }   
     }
 
@@ -235,12 +232,7 @@ const App = () => {
        
         
     }
-    
-    // if(gameStarted && timeLeft <=0   && passed==='false'){
-    //     setAttempts(attemps-1)
-    //     setPassed('false')
-    // }
-    
+  
     //Update Game settings
 
     useEffect(()=>{
@@ -250,14 +242,20 @@ const App = () => {
         window.localStorage.setItem('settings', userSettings)
 
     //Simulate A CountDown Timer
-   
-
-    if(timeLeft > 0 && gameStarted && !(passed==='true')){
-       setTimeout(()=>setTimeLeft(timeLeft-1), 1000); 
-    }else {
-       
+    if(passed==='true'){
         setTimeLeft(0);
     }
+
+    if(timeLeft > 0 && gameStarted){
+        if(passed === 'no'){
+            
+            setTimeout(()=>setTimeLeft(timeLeft-1), 1000); 
+        }else if(passed==='true' || passed==='false'){
+            setTimeLeft(0)
+        }
+    }
+
+   
     
 
 
