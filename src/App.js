@@ -26,12 +26,13 @@ const App = () => {
     const [isPlaying, setIsPlaying] = useState(false);
     const [gameStarted, setGameStarted] = useState(false);
     const [questionArray, setQuestionArray] = useState([{question: 'hello', options: ['Home'], answer: 'ok'}]);
-    const [gameTime, setGameTime] = useState(5);
+    const [gameTime, setGameTime] = useState(15);
     const [timeLeft, setTimeLeft] = useState(gameTime);
     const [currentIndex, setCurrentIndex] = useState(0);
     const [passed, setPassed] = useState('no');
     const [score, setScore] = useState(0);
     const [attemps, setAttempts] = useState(15);
+    
 
 
     
