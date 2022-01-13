@@ -11,11 +11,10 @@ import midSound from './sounds/final mid game.mp3';
 import failSound from './sounds/fail short.wav';
 import passedSound from './sounds/click sound.wav';
 import overSound from './sounds/game over.mp3';
-
 import { useState, useEffect } from "react";
 
 const App = () => {
-
+    let p;
     const settingsFromBackUp = window.localStorage.getItem('settings');
     const settingData = JSON.parse(settingsFromBackUp);
    
@@ -23,267 +22,219 @@ const App = () => {
     const [gameCat, setGameCat] = useState(settingsFromBackUp ? settingData.gameCat : 'generalknowledge');
     const [gameLevel, setGameLevel] = useState(settingsFromBackUp ? settingData.gameLevel : 'easy');
     const [displayMenu, setDisplayMenu] = useState(false);
-    const [isPlaying, setIsPlaying] = useState(false);
     const [gameStarted, setGameStarted] = useState(false);
-    const [questionArray, setQuestionArray] = useState([{question: 'hello', options: ['Home'], answer: 'ok'}]);
-    const [gameTime, setGameTime] = useState(15);
+    const [questionArray, setQuestionArray] = useState([{}]);
+    const [gameTime, setGameTime] = useState(10);
     const [timeLeft, setTimeLeft] = useState(gameTime);
     const [currentIndex, setCurrentIndex] = useState(0);
-    const [passed, setPassed] = useState('no');
+    const [passed, setPassed] = useState(false);
     const [score, setScore] = useState(0);
-    const [attemps, setAttempts] = useState(15);
+    const [attempsLeft, setAttemptsLeft] = useState(15);
     
-
-
-    
-
-    
-
-
-
-  
-
     
     // Menu Bar Actions
-    
     const handleMenuClick = ()=>{
         setDisplayMenu(!displayMenu);
     }
-
     
     // Update Category Chosen by the user
-
     const updateCategory = (chosenCat)=>{
-        setGameCat(chosenCat)
+        setGameCat(chosenCat);
     }
     
     //Update Game Level set by the user
-    
     const updateLevel = (level)=>{
-        setGameLevel(level)
-        // handleTimer(timerValue)
+        setGameLevel(level);
     }
     
 
     
     //Handle Sound ON/OFF
-      const toggleOnSound = (resp)=>{
-          setOnSound(resp)
-
-        if(onSound){
-            setIsPlaying(!isPlaying)
-
-        }else if(!onSound && !isPlaying) {
-            setIsPlaying(!isPlaying)
-        }
+    const toggleOnSound = (resp)=>{
+        setOnSound(resp);
     }
     
-    
-    
-    //Play Actions
-    
-    const questionsFetched = window.localStorage.getItem(`${gameCat}-${gameLevel}`);
-    if(!questionsFetched){
+    const startTmer = ()=>{
+       p =  setInterval(()=>{
+            setTimeLeft(timeLeft => {
+                if(timeLeft > 0 && passed=='undefined'){
+                    return timeLeft - 1
+                }else{
 
-        let id = 9;
-        
-        switch(gameCat){
-            case 'books':
-                id = 10;
-                break;
-
-            case 'comics':
-                id = 29;
-                break;
-
-            case 'computers':
-                id = 18;
-                break;
-
-            case 'geography':
-                id = 22;
-                break;
-
-            case 'mathematics':
-                id = 19;
-                break;
-            
-            case 'television':
-                id = 14;
-                break;
-
-            case 'videogames':
-                id = 15;
-                break;
-
-            case 'generalknowledge':
-                id = 9;
-                break;
-            
-            default:
-                id = 9;
-        }
-
-       console.log('Current ID', id)
-        
-      
-        const fetchQuestions = async ()=>{
-          
-            const response = await fetch(`https://opentdb.com/api.php?amount=50&category=${id}&difficulty=${gameLevel}&type=multiple`);
-
-            const data = await response.json();
-            const questions = data.results;
-            const k = [];
-            for(let q of questions){
-                let {question, incorrect_answers, correct_answer } = q;
-                const i = Math.floor(Math.random()*3);
-                incorrect_answers.splice(i, 0, correct_answer);
-                let arr = [...incorrect_answers];
-
-                for(let i=arr.length-1; i > 0; i--){
-                     const p = Math.floor(Math.random()*i);
-                    [arr[p], arr[i]] = [arr[i], arr[p]];
-
+                    clearInterval(p)
+                    return 0
                 }
-                
-                incorrect_answers.sort((a, b)=> 0.5 - Math.random());
-                k.push({question, options: [...arr] , answer: correct_answer});
-            }
+            })
+        }, 1000)
 
-            window.localStorage.setItem(`${gameCat}-${gameLevel}`, JSON.stringify(k));
-            
-         }
-        fetchQuestions();
-            
-
-       
-        
+        if(timeLeft <= 0){
+            clearInterval(p)
+        }
     }
+
+    const stopTimer = ()=>{
+        clearInterval(p)
+    }
+    
     
     
     const play = ()=>{
-        //Check if we already have the questions downloaded and stored locally
-        // let sortedQuest = [...questionArray]
-        // sortedQuest[currentIndex].options.sort((a, b)=> 0.5 - Math.random());
-        setQuestionArray(JSON.parse(window.localStorage.getItem(`${gameCat}-${gameLevel}`)).length !== 0 ? JSON.parse(window.localStorage.getItem(`${gameCat}-${gameLevel}`)).sort((a, b)=> 0.5 - Math.random()) : JSON.parse(window.localStorage.getItem(`generalknowledge-${gameLevel}`)).sort((a, b)=> 0.5 - Math.random()));
-       
-        setPassed('no')
-        setScore(0)
-        setGameTime(gameTime)
-        setAttempts(15)
-        setGameStarted(true);
-        const startPlay = ()=>{
-            
-            if(questionsFetched !== null){
-                setTimeLeft(gameTime)
-                if(onSound){
-                    setIsPlaying(true)
-                 }
-                
-            }
+        let currentQuestion = JSON.parse(window.localStorage.getItem(`${gameCat}-${gameLevel}`)).sort((a, b)=>0.5 - Math.random());
+        for(let q of currentQuestion){
+            q.options.sort((a,b)=>0.5 - Math.random())
         }
-        setTimeout(startPlay, 500)
-        setScore(0);
-         
-    }
-    
-    
-
-    const checkAnswer = (option)=>{
-
-        if(questionArray[currentIndex].answer === option){
-            setPassed('true')
-            setTimeLeft(0)
-            setScore(score+1)
-            setTimeout(onNextClick, 100)
-        }else{
-            setPassed('false')
-        }   
-    }
-
-    //Handle Next Button Click
-
-    const onNextClick = ()=>{
-
-        if(attemps > 0){
-            if(passed==='false'){
-                setAttempts(attemps-1)
-                
-               
-            }
-            setPassed('no')
-            setTimeLeft(gameTime);
-            setCurrentIndex(currentIndex+1);
-        }
-
+        setPassed('undefined')
+        setCurrentIndex(0)
+        setQuestionArray(currentQuestion)
+        setTimeLeft(gameTime)
+        startTmer()
         
+        setGameStarted(!gameStarted)
+
     }
 
+    // Check answer
+
+    const handleCheck = (id, target)=>{
+        if(questionArray[currentIndex].answer.id === id){
+            setPassed(true)
+            target.style.background = 'green';
+            clearInterval(p)
+            stopTimer()
+            setTimeout(handleNext, 500)
+        }else{
+            target.style.background = 'darkred'
+            setPassed(false)
+
+        }
+    }
+    
+    
+    //Handle Next Button Click
+    const handleNext = ()=>{
+        setPassed('undefined')
+        if(currentIndex+1 < questionArray.length){
+            setTimeLeft(gameTime)
+            setCurrentIndex(currentIndex + 1)
+        }
+        startTmer()
+    }
 
     // Handle End Button Click
-
     const onEndClick = ()=>{
+        stopTimer()
         setGameStarted(!gameStarted)
-        setTimeLeft(0);
-        setCurrentIndex(0);
-
-        
-        
-
-       
-        
     }
-  
-    //Update Game settings
-
+    
+    
     useEffect(()=>{
         //Backup user's settings
         const settings = { gameCat, gameLevel,onSound };
-        const userSettings = JSON.stringify(settings)
-        window.localStorage.setItem('settings', userSettings)
+        const userSettings = JSON.stringify(settings);
+        window.localStorage.setItem('settings', userSettings);
 
-    //Simulate A CountDown Timer
-    if(passed==='true'){
-        setTimeLeft(0);
-    }
+        //fetch the question
+        const questFromLocal = JSON.parse(window.localStorage.getItem(`${gameCat}-${gameLevel}`));
 
-    if(timeLeft > 0 && gameStarted){
-        if(passed === 'no'){
+        if(!questFromLocal){
             
-            setTimeout(()=>setTimeLeft(timeLeft-1), 1000); 
-        }else if(passed==='true' || passed==='false'){
-            setTimeLeft(0)
+            let catId = 9;
+            switch(gameCat){
+                case 'books':
+                    catId = 10;
+                    break;
+    
+                case 'geography':
+                    catId= 22;
+                    break;
+    
+                case 'videogames':
+                    catId = 15;
+                    break;
+    
+                case 'generalknowledge':
+                    catId = 9;
+                    break;
+                
+                default:
+                    catId = 9;
+            }
+
+            fetch(`https://opentdb.com/api.php?amount=50&category=${catId}&difficulty=${gameLevel}&type=multiple`)
+            .then((response)=>{
+                return response.json();
+            })
+            .then((data)=>{
+                return data.results;
+            })
+            .then(questions=>{
+                
+                const modifiedQuestions = [];
+                for(let q of questions){
+
+                let {question, incorrect_answers, correct_answer } = q;
+
+                let options = [];
+                for(let text of incorrect_answers){
+                    let id = Math.floor(Math.random()*Date.now());
+
+                    let obj = {text: text, id}
+                    options.push(obj)
+                }
+                let id = Math.floor(Math.random()*Date.now());
+                let answer = {text: correct_answer, id};
+                let pos = Math.floor(Math.random()*options.length)
+                options.splice(pos, 0, answer);
+               
+    
+                for(let i = options.length-1; i > 0; i--){
+                     const p = Math.floor(Math.random()*i);
+                    [options[p], options[i]] = [options[i], options[p]];
+                }
+                
+                modifiedQuestions.push({question, options, answer});
+            }
+            window.localStorage.setItem(`${gameCat}-${gameLevel}`, JSON.stringify(modifiedQuestions));
+            // setQuestionArray(modifiedQuestions)
+                
+            }).catch(err=>{
+                alert(`Oops..unable to fetch question from the API\nPlease check your network connection and refresh the page...\nYou may select a different category from the MENU options`)
+            })
         }
-    }
-
-   
+        
+        // }else{
+        //     setQuestionArray(questFromLocal.sort((a, b)=> 0.5 -Math.random()));
+        // }
+        
+        
+        // Simulate A CountDown Timer
+        if(timeLeft > 0 && gameStarted){
+                setTimeout(()=>setTimeLeft(timeLeft-1), 1000);
+                if(timeLeft === 0){
+                    setTimeLeft(0)
+                }
+        }
+       
+    }, [gameCat, gameLevel, onSound, gameStarted, timeLeft])
     
-
-
-    }, [gameCat, gameLevel, onSound,timeLeft, gameStarted, passed])
     
-   
-
+    
     //Rendering Zone
-
     return (
         <>  
             <TopBar onclick={handleMenuClick} displayMenu={displayMenu} gameStarted={gameStarted}/>
+
             <MenuOptions  displayMenu={displayMenu}  toggleOnSound={toggleOnSound}  onSound={onSound} play={play} updateCategory={updateCategory} updateLevel={updateLevel} gameLevel={gameLevel}gameCat={gameCat} />
+
             <PlayButton play={play} displayMenu={displayMenu} gameStarted={gameStarted}/>
-            <GamePlayInfo attemps={attemps} score={score} gameStarted={gameStarted} timeLeft={timeLeft}/>
 
-            <Sound playStatus={isPlaying && onSound && attemps > 0 ? Sound.status.PLAYING : Sound.status.STOPPED}  url={currentIndex > 5 ? midSound: startSound} loop={true} volume={gameStarted ? 45 : displayMenu ? 15: 25} autoLoad={true}/>
+            <GamePlayInfo gameTime={gameTime} gameStarted={gameStarted} timeLeft={timeLeft}/>
 
-            <Sound playStatus={isPlaying && onSound && passed==='true' ? Sound.status.PLAYING : Sound.status.STOPPED}  url={passedSound} loop={false} volume={60} autoLoad={true}/>
-
-            <Sound playStatus={isPlaying && onSound && passed==='false'  ? Sound.status.PLAYING : Sound.status.STOPPED}   url={failSound} loop={false} volume={60} autoLoad={true}/>
-
-            <Sound playStatus={isPlaying && onSound && attemps === 0 ? Sound.status.PLAYING : Sound.status.STOPPED}  url={overSound} loop={false} volume={60} autoLoad={true}/>
-
+            <Sound playStatus={onSound && gameStarted ? Sound.status.PLAYING : Sound.status.STOPPED}  url={startSound} loop={true} volume={30} autoLoad={true}/>
            
            <EndButton gameStarted={gameStarted} handleClick={onEndClick}/>
-           <QuestionInterface attemps={attemps} passed={passed} currentIndex={currentIndex} questionArray={questionArray} checkAnswer={checkAnswer} gameStarted={gameStarted} timeLeft={timeLeft} onNextClick={onNextClick}/>
+
+           <QuestionInterface passed={passed} timeLeft={timeLeft} handleCheck={handleCheck}  gameStarted={gameStarted} questionArray={questionArray[currentIndex]} handleNext={handleNext}/>
            <Footer />
         </>
     )

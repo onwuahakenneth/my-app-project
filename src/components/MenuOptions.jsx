@@ -12,12 +12,7 @@ const MenuOptions = ({displayMenu, toggleOnSound, onSound, updateCategory, updat
 
           <select name='gameCategory' className='categorySelect' defaultValue={gameCat} id='gameCategory' onChange={(e)=>updateCategory(e.target.value)}>
 
-              <option value='books' >Books</option>
-              <option value='comics'>Comics</option>
-              <option  value='computers'>Computers</option>
-              <option value='geography'>Geography</option>
-              <option value='mathematics' >Mathematics</option>
-              <option value='television'>Television</option>
+              <option value='geography' >Geography</option>
               <option value='videogames'>Video Games</option>
               <option value='generalknowledge'>General Knowledge</option>
 

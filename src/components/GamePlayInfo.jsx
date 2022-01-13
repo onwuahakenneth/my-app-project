@@ -1,22 +1,22 @@
 
 
-const GamePlayInfo = ({gameStarted, timeLeft, score, attemps}) => {
+const GamePlayInfo = ({gameStarted, timeLeft, gameTime}) => {
     
     return (
         <nav className={`gamePlayInfo ${gameStarted ? 'showGameInfo' : ''}`}>
 
             <div className='timeLeft'>
                 <span>Time left </span>
-                <span>:{`${timeLeft < 10 ? '0' : ''}${timeLeft}`}</span>
+                <span>:{timeLeft < 10 ? `0${timeLeft}` : timeLeft}</span>
             </div>
 
             <div className='gameScore'>
                  <span>Score </span>
-                <span>{score}</span>
+                <span></span>
             </div>
 
             <div className='gameAttempt'>
-                <span > Live{`${attemps > 0 ? 's' : ''}`}:</span><span>{attemps}</span>
+                <span > Lives:</span><span></span>
             </div>
             
         </nav>
